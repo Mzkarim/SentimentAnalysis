@@ -1,0 +1,85 @@
+#####################################################################
+
+# STEP 1: INSTALL REQUIRED PACKAGES AND CONNECT TO ALL LIBARIES
+
+#####################################################################
+
+install.packages("devtools")
+require(devtools)
+install_url("http://cran.r-project.org/src/contrib/Archive/sentiment/sentiment_0.2.tar.gz")
+require(sentiment)
+ls("package:sentiment")
+
+
+# install_url("http://cran.r-project.org/src/contrib/Archive/Snowball/Snowball_0.0-11.tar.gz")
+# require(snowball)
+
+library(RCurl)
+library(ROAuth)
+library(twitteR)
+library(plyr)
+library(ggplot2)
+library(reshape2)
+library(sentiment)
+library(wordcloud)
+library(RColorBrewer)
+#####################################################################
+
+# STEP 2: SET UP TWITTER API TO WORK ON R ENVIRONMENT
+
+#####################################################################
+
+#library(RCurl)
+#library(ROAuth)
+#library(twitteR)
+
+
+download.file(url="http://curl.haxx.se/ca/cacert.pem", destfile="cacert.pem")
+
+#Set constant request URL
+          requestURL <- "https://api.twitter.com/oauth/request_token"
+
+# Set constant access URL
+          accessURL <- "https://api.twitter.com/oauth/access_token"
+
+# Set constant auth URL
+          authURL <- "https://api.twitter.com/oauth/authorize"
+
+
+# Put the both Consumer Key and Consumer Secret key from Twitter App.
+         consumerKey <- "59oDfXxmBBm22p2j3Gowy4lEE"  
+         consumerSecret <- "bZufUMPivqtX94xG4Bt3QmsmqyL7TsDbkW8Kuo3cGYeFfKoysY"
+
+
+#Create the authorization object by calling function OAuthFactory
+Cred <- OAuthFactory$new(consumerKey=consumerKey,
+                         consumerSecret=consumerSecret,
+                         requestURL=requestURL,
+                         accessURL=accessURL, 
+                         authURL=authURL)
+
+# Handshake Oauth; Get code and enter it on URL in Console
+Cred$handshake(
+  cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))
+
+#OAUTH Authentication
+
+         consumerKey <- "59oDfXxmBBm22p2j3Gowy4lEE" 
+         consumerSecret <- "bZufUMPivqtX94xG4Bt3QmsmqyL7TsDbkW8Kuo3cGYeFfKoysY"
+         access_Token <- "3060838521-u5eXreDFHOqaxUcvTYMFyuEXImu5RlpdiY436h8" 
+         access_Secret <- "Q55FxITLmzlJWW4xpNbwnsW2UPXQZL4KiOWf9QdsDlYKt"
+
+# Create Twitter connection
+setup_twitter_oauth(consumerKey,consumerSecret,access_Token,access_Secret)
+
+#####################################################################
+
+# STEP 3 : COLLECT TWEETS 
+
+#####################################################################
+
+#Use the searchTwitter function to only get tweets 
+
+
+tweets = searchTwitter('#Ironman3',n=200, lang="en")
+tweets
