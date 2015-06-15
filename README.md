@@ -13,6 +13,7 @@ Sentiment Analysis on Twitter data
 To do sentiment analysis with RStudio we first need to install necessary packages.
 
 Our sentiment analysis code are divided into four parts/blocks :
+
     1. Collecting twitter data from twitter using twitter API  
           This is the R code used for twitter data collection using twitter API. Note that to extract twitter data through 
           twitter API we need to open an development account with twitter.The detail procedures along with twitter data
