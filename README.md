@@ -1,6 +1,11 @@
 # SentimentAnalysis
 Sentiment Analysis on Twitter data
 
+    Microblogging websites tweeter have evolved to become a source of varied kind of information and
+    playing an important role for sentiment analysis world-wide.Analyzing tweets has applications in 
+    understanding how public sentiment is shaped, tracking public sentiment and polarization with respect
+    to their views and issues and understanding the impact of tweets from various entities.
+    
     For sentiment analysis We use statistical analysis package RStudio (Version 0.99.441). RStudio is a set of 
     integrated tools designed to help us be more productive with R. It includes a console, syntax-highlighting 
     editor that supports direct code execution, as well as tools for plotting, history, debugging and workspace 
