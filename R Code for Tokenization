@@ -1,0 +1,86 @@
+#Tokenization
+#Read the dataset file 
+
+tweets<- read.csv(file.choose(), header=TRUE, sep=",",check.names=TRUE)
+
+#tweets<-read.csv('c:/Sentiment Analysis/ironmantweet.csv',header=T, stringsAsFactors = FALSE)
+
+#check dataset structure
+
+head(tweets)
+str(tweets)
+class(tweets)
+
+#Load necessary packages/libraries
+
+library(tm)
+library(RWeka)
+library(plyr)
+library(slam)
+
+## create corpus
+corpus1 <- Corpus(VectorSource(tweets))
+
+## create a copy of corpus to use later as a dictionary for stem completion 
+mycorpus <- corpus1
+
+## clean the data
+corpus1 <- tm_map(corpus1, content_transformer(tolower))
+corpus1 <- tm_map(corpus1, removeNumbers)
+corpus1 <- tm_map(corpus1, removePunctuation)
+corpus1 <- tm_map(corpus1, removeWords, stopwords("english"))
+corpus1 <- tm_map(corpus1, stemDocument, "english")
+corpus1 <- tm_map(corpus1, stripWhitespace)
+corpus1 <- tm_map(corpus1, PlainTextDocument)
+
+tweet <- list(weighting = weightTf, stopwords  = skipwords,
+              removePunctuation = TRUE,
+              tolower = TRUE,
+              minWordLength = 4,
+              removeNumbers = TRUE, stripWhitespace = TRUE, 
+              stemDocument= TRUE)
+
+####  Unigram Tokenizer  #################
+UnigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 1, max = 1))
+unigrams <- TermDocumentMatrix(corpus1, control = list(tokenize = UnigramTokenizer))
+
+## convert as matrix
+    unigrams <- as.matrix(unigrams)
+    print(unigrams)
+
+## Term Frequency
+    unigrams.freq <- sort(row_sums(unigrams), decreasing = TRUE)
+    print(unigrams.freq)
+
+##Create the top "5" data frames from the matrices
+    top_freq_unigram <- data.frame("Term"=names(head(unigrams.freq,10)), 
+                                   "Frequency"=head(unigrams.freq,10))
+    print(top_freq_unigram)
+
+    
+    m <- as.matrix(tdm)
+    v <- sort(colSums(m),decreasing=TRUE)
+    
+    
+    words <- names(v)
+    d <- data.frame(word=words, freq=v)
+    wordcloud(d$word,d$freq,min.freq=12)    
+    
+####  Bigram Tokenizer  ######################
+
+BigramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 2, max = 2))
+bigrams <- TermDocumentMatrix(corpus1, control = list(tokenize = BigramTokenizer))
+
+## convert as matrix
+bigrams <- as.matrix(bigrams)
+print(bigrams)
+
+## Term Frequency
+bigrams.freq <- sort(row_sums(bigrams), decreasing = TRUE)
+print(bigrams.freq)
+
+##Create the top "5" data frames from the matrices
+Top_freq_bigrams <- data.frame("Term"=names(head(bigrams.freq,50)), 
+                               "Frequency"=head(bigrams.freq,50))
+print(Top_freq_bigrams)
+
