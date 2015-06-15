@@ -10,7 +10,6 @@ install_url("http://cran.r-project.org/src/contrib/Archive/sentiment/sentiment_0
 require(sentiment)
 ls("package:sentiment")
 
-
 # install_url("http://cran.r-project.org/src/contrib/Archive/Snowball/Snowball_0.0-11.tar.gz")
 # require(snowball)
 
@@ -33,7 +32,6 @@ library(RColorBrewer)
 #library(ROAuth)
 #library(twitteR)
 
-
 download.file(url="http://curl.haxx.se/ca/cacert.pem", destfile="cacert.pem")
 
 #Set constant request URL
@@ -44,7 +42,6 @@ accessURL <- "https://api.twitter.com/oauth/access_token"
 
 # Set constant auth URL
 authURL <- "https://api.twitter.com/oauth/authorize"
-
 
 # Put the both Consumer Key and Consumer Secret key from Twitter App.
 consumerKey <- "59oDfXxmBBm22p2j3Gowy4lEE"  
@@ -62,7 +59,6 @@ Cred <- OAuthFactory$new(consumerKey=consumerKey,
 Cred$handshake(
   cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))
 
-
 #OAUTH Authentication
 
 consumerKey <- "59oDfXxmBBm22p2j3Gowy4lEE" 
@@ -73,83 +69,83 @@ access_Secret <- "Q55FxITLmzlJWW4xpNbwnsW2UPXQZL4KiOWf9QdsDlYKt"
 # Create Twitter connection
 setup_twitter_oauth(consumerKey,consumerSecret,access_Token,access_Secret)
 
-
-#Get the Twitter
+#####################################################################
+# STEP 3 : COLLECT TWEETS 
+#####################################################################
 
 tweets = searchTwitter('#Ironman3',n=200, lang="en")
 tweets
 
-
+#####################################################################
+# STEP 4 : PREPARE THE TEXT FOR SENTIMENT ANALYSIS
+#####################################################################
 
 tweet.text = laply(tweets,function(t)t$getText())
 
 clean.text <- function(some_txt)
 {
-  some_txt = gsub("&amp", "", some_txt)
-  
-  some_txt = gsub("(RT|via)((?:\b\\W*@\\w+)+)", "", some_txt)
-  
-  some_txt = gsub("@\\w+", "", some_txt)
-  
-  some_txt = gsub("[[:punct:]]", "", some_txt)
-  
-  some_txt = gsub("[[:digit:]]", "", some_txt)
-  
-  some_txt = gsub("http\\w+", "", some_txt)
-  
-  some_txt = gsub("[ t]{2,}", "", some_txt)
-  
-  some_txt = gsub("^\\s+|\\s+$", "", some_txt)
+      some_txt = gsub("&amp", "", some_txt)
+      some_txt = gsub("(RT|via)((?:\b\\W*@\\w+)+)", "", some_txt)
+      some_txt = gsub("@\\w+", "", some_txt)
+      some_txt = gsub("[[:punct:]]", "", some_txt)
+      some_txt = gsub("[[:digit:]]", "", some_txt)
+      some_txt = gsub("http\\w+", "", some_txt)
+      some_txt = gsub("[ t]{2,}", "", some_txt)
+      some_txt = gsub("^\\s+|\\s+$", "", some_txt)
   
   # define "tolower error handling" function
   
-  try.tolower = function(x)
+    try.tolower = function(x)
     
-  {
+      {
     
-    y = NA
+        y = NA
     
-    try_error = tryCatch(tolower(x), error=function(e) e)
+            try_error = tryCatch(tolower(x), error=function(e) e)
     
-    if (!inherits(try_error, "error"))
-      
-      y = tolower(x)
+               if (!inherits(try_error, "error"))
+                         y = tolower(x)
+                             return(y)
     
-    return(y)
-    
-  }
+      }
   
-  some_txt = sapply(some_txt, try.tolower)
+           some_txt = sapply(some_txt, try.tolower)
+           some_txt = some_txt[some_txt != ""]
   
-  some_txt = some_txt[some_txt != ""]
-  
-  names(some_txt) = NULL
+        names(some_txt) = NULL
   
   return(some_txt)
   
 }
 
+### STEP 4.1(a): Clean the content with "clean.text" function & remove qoute
+    tweet_txt = clean.text(tweet_txt)
+    clean_text = clean.text(tweets.text)
 
-clean_text = clean.text(tweets.text)
+ ## STEP 4.2: Transforming Text
 
-tweet_corpus = Corpus(VectorSource(clean_text))
+      ### STEP 7.2.1 : Build a corpus, which is a collection of text documents
+      #               VectorSource specifies that the source is character vectors
 
-tdm = TermDocumentMatrix(tweet_corpus, control = list(removePunctuation = TRUE,stopwords = c("machine", "learning", stopwords("english")), removeNumbers = TRUE, tolower = TRUE))
-
-m = as.matrix(tdm) #we define tdm as matrix
-
-word_freqs = sort(rowSums(m), decreasing=TRUE) #now we get the word orders in decreasing order
-
-dm = data.frame(word=names(word_freqs), freq=word_freqs) #we create our data set
-
-wordcloud(dm$word, dm$freq, random.order=FALSE, colors=brewer.pal(8, "Dark2")) #and we visualize our data
+  tweet_corpus = Corpus(VectorSource(clean_text))
 
 
-png("Cloud.png", width=12, height=8, units="in", res=300)
+  tdm = TermDocumentMatrix(tweet_corpus, control = list(removePunctuation = TRUE,stopwords = c("machine", "learning", stopwords("english")), removeNumbers = TRUE, tolower = TRUE))
 
-wordcloud(dm$word, dm$freq, random.order=FALSE, colors=brewer.pal(8, "Dark2"))
+ #we define tdm as matrix
+m = as.matrix(tdm)
 
-dev.off()
+## Now we get the word orders in decreasing order
+word_freqs = sort(rowSums(m), decreasing=TRUE) 
+
+## we create our data set
+dm = data.frame(word=names(word_freqs), freq=word_freqs) 
+
+# And now we visualize our data
+     wordcloud(dm$word, dm$freq, random.order=FALSE, colors=brewer.pal(8, "Dark2")) 
+     png("Cloud.png", width=12, height=8, units="in", res=300)
+     wordcloud(dm$word, dm$freq, random.order=FALSE, colors=brewer.pal(8, "Dark2"))
+     dev.off()
 
 
 
